@@ -37,6 +37,8 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun clearSessionPreference() {
         /* Preferencias sin kotlin para guardar sesiones temporales en el dispositivo
         val preferences = getSharedPreferences("general", Context.MODE_PRIVATE)

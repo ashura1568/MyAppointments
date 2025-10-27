@@ -1,6 +1,7 @@
 package com.example.myappointments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
@@ -25,7 +26,8 @@ class CreateAppointmentActivity : AppCompatActivity() {
     private val selectedCalendar = Calendar.getInstance()
 
     private var selectedRadioBtn: RadioButton? = null
-
+    val cvStep1: CardView = findViewById(R.id.cvStep1)
+    val cvStep2: CardView = findViewById(R.id.cvStep2)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
@@ -33,14 +35,19 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
         val buttonNext: Button = findViewById(R.id.btnNext)
         val buttonConfirm: Button = findViewById(R.id.btnConfirmAppointment)
-        val cvStep1: CardView = findViewById(R.id.cvStep1)
-        val cvStep2: CardView = findViewById(R.id.cvStep2)
+
         val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
         val doctorespecialty: Spinner = findViewById(R.id.spinnerDoctors)
 
         buttonNext.setOnClickListener {
-            cvStep1.visibility = View.GONE
-            cvStep2.visibility = View.VISIBLE
+            val etDescription: EditText = findViewById(R.id.etDescription)
+            if (etDescription.text.toString().length < 3) {
+                etDescription.error = getString(R.string.validate_appointment_description)
+            } else {
+                // continue to step 2
+                cvStep1.visibility = View.GONE
+                cvStep2.visibility = View.VISIBLE
+            }
         }
 
         buttonConfirm.setOnClickListener {
@@ -146,4 +153,29 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
     private fun Int.twoDigits()
             = if (this>=10) this.toString() else "0$this"
+
+    @Deprecated("Deprecated in Java")
+    @SuppressLint("GestureBackNavigation", "MissingSuperCall")
+    override fun onBackPressed() {
+        if(cvStep2.visibility == View.VISIBLE){
+            cvStep2.visibility == View.GONE
+            cvStep1.visibility == View.VISIBLE
+
+        }else if(cvStep1.visibility == View.VISIBLE){
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(getString(R.string.dialog_create_appointment_exit_title))
+            builder.setMessage(getString(R.string.dialog_create_appointment_exit_message))
+            builder.setPositiveButton(getString(R.string.dialog_create_appointment_exit_positive_btn)) { _, _ ->
+                finish()
+            }
+            builder.setNegativeButton(getString(R.string.dialog_create_appointment_exit_negative_btn)) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+
+    }
+
 }

@@ -1,19 +1,27 @@
 package com.example.myappointments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myappointments.PreferenceHelper.get
 import com.example.myappointments.PreferenceHelper.set
+import com.google.android.material.snackbar.Snackbar
+
 
 class MainActivity : AppCompatActivity() {
+
+    val mainLayout: LinearLayout = findViewById(R.id.mainLayout)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         // shared preferences
         // SQLite
         // files
@@ -66,6 +74,21 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MenuActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    @Deprecated("Deprecated in Java")
+    @SuppressLint("GestureBackNavigation", "MissingSuperCall")
+    override fun onBackPressed() {
+
+        val snackBar by lazy {
+            Snackbar.make(mainLayout, R.string.press_back_again, Snackbar.LENGTH_SHORT)
+        }
+
+        if (snackBar.isShown)
+            //super.onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
+        else
+            snackBar.show()
     }
 }
 

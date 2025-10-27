@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/createAppointmentLinearLayout"
+<LinearLayout android:id="@+id/createAppointmentLinearLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".CreateAppointmentActivity"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/bg_gradient"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:paddingTop="12dp"
@@ -21,9 +22,11 @@
         android:text="@string/label_create_appointment"/>
 
     <androidx.cardview.widget.CardView
-        android:visibility="gone"
+
         android:id="@+id/cvStep1"
-        android:elevation="8dp"
+        app:contentPadding="12dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -38,6 +41,7 @@
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
             <EditText
+                android:id="@+id/etDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -66,6 +70,7 @@
                 android:orientation="vertical">
                 <RadioButton
                     android:id="@+id/rbType1"
+                    android:checked="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/type1"/>
@@ -93,7 +98,7 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvStep2"
-
+        android:visibility="gone"
         android:elevation="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
