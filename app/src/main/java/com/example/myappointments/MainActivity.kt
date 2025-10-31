@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -16,12 +17,12 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
-    val mainLayout: LinearLayout = findViewById(R.id.mainLayout)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        //val etEmail: EditText = findViewById(R.id.etEmail)
         // shared preferences
         // SQLite
         // files
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     @SuppressLint("GestureBackNavigation", "MissingSuperCall")
     override fun onBackPressed() {
-
+        val mainLayout: LinearLayout = findViewById(R.id.mainLayout)
         val snackBar by lazy {
             Snackbar.make(mainLayout, R.string.press_back_again, Snackbar.LENGTH_SHORT)
         }
