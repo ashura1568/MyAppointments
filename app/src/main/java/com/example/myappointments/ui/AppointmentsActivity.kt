@@ -1,13 +1,10 @@
-package com.example.myappointments
+package com.example.myappointments.ui
 
 import android.os.Bundle
-import android.widget.LinearLayout
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myappointments.R
 import com.example.myappointments.model.Appointment
 
 class AppointmentsActivity : AppCompatActivity() {

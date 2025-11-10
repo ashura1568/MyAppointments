@@ -1,9 +1,8 @@
-package com.example.myappointments
+package com.example.myappointments.ui
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -15,16 +14,22 @@ import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.myappointments.R
 import java.util.Calendar
 import com.google.android.material.snackbar.Snackbar
+import com.example.myappointments.io.ApiService
+import com.example.myappointments.model.Specialty
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class CreateAppointmentActivity : AppCompatActivity() {
+
+    val apiService: ApiService by lazy {
+        ApiService.create()
+    }
     private var selectedTimeRadioBtn: RadioButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +46,7 @@ class CreateAppointmentActivity : AppCompatActivity() {
         val buttonConfirm: Button = findViewById(R.id.btnConfirmAppointment)
         val btnNext2: Button = findViewById(R.id.btnNext2)
 
-        val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
+
         val doctorespecialty: Spinner = findViewById(R.id.spinnerDoctors)
 
         val etScheduledDate: EditText = findViewById(R.id.etScheduledDate)
@@ -89,10 +94,12 @@ class CreateAppointmentActivity : AppCompatActivity() {
             finish()
         }
 
-
+        loadSpecialties()
+        /*val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
         val specialtyOptions=arrayOf("Especialidad A","Especialidad B","Especialidad C")
         spinnerespecialty.adapter=
-            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, specialtyOptions)
+            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, specialtyOptions)*/
+
 
         val doctorOptions=arrayOf("Doctor A","Doctor B","Doctor C")
         doctorespecialty.adapter=
@@ -102,7 +109,40 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
     }
 
+    private fun loadSpecialties() {
 
+
+
+        val call = apiService.getSpecialties()
+        call.enqueue(object: Callback<ArrayList<Specialty>> {
+            override fun onFailure(call: Call<ArrayList<Specialty>>, t: Throwable) {
+                Toast.makeText(this@CreateAppointmentActivity, "Ocurrio un problema al cargar las especialidades", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+
+            override fun onResponse(call: Call<ArrayList<Specialty>>, response: Response<ArrayList<Specialty>>) {
+                if (response.isSuccessful) { // [200...300)
+                    /*response.body()?.let {
+                        val specialties = it.toMutableList()
+                        spinnerespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, specialties)
+                    }*/
+                    val specialties = response.body()
+                    val specialtyOptions = ArrayList<String>()
+
+                    specialties?.forEach {
+                        specialtyOptions.add(it.name)
+                    }
+                    val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
+                    spinnerespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, specialtyOptions)
+                }
+            }
+        })
+
+
+        //val specialtyOptions=arrayOf("Especialidad A","Especialidad B","Especialidad C")
+        /*spinnerespecialty.adapter=
+            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, specialtyOptions)*/
+    }
     @SuppressLint("StringFormatMatches")
     fun onClickScheduledDate(v: View?) {
 
@@ -193,7 +233,7 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     @SuppressLint("GestureBackNavigation", "MissingSuperCall")
-    /*override fun onBackPressed() {
+    override fun onBackPressed() {
         setContentView(R.layout.activity_create_appointment)
 
         val cvStep1: CardView = findViewById(R.id.cvStep1)
@@ -230,8 +270,7 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
         }
 
-    }*/
-
+    }
 
 
     private fun showAppointmentDataToConfirm() {

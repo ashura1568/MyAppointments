@@ -1,10 +1,11 @@
-package com.example.myappointments
+package com.example.myappointments.ui
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myappointments.R
 import com.example.myappointments.model.Appointment
 
 class AppointmentAdapter(val appointments: ArrayList<Appointment>)

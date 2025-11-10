@@ -1,11 +1,12 @@
-package com.example.myappointments
+package com.example.myappointments.ui
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myappointments.PreferenceHelper
 import com.example.myappointments.PreferenceHelper.set
+import com.example.myappointments.R
 
 class MenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
