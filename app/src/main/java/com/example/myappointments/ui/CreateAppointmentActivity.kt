@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -20,6 +24,8 @@ import com.example.myappointments.R
 import java.util.Calendar
 import com.google.android.material.snackbar.Snackbar
 import com.example.myappointments.io.ApiService
+import com.example.myappointments.model.Doctor
+import com.example.myappointments.model.Schedule
 import com.example.myappointments.model.Specialty
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,6 +37,10 @@ class CreateAppointmentActivity : AppCompatActivity() {
         ApiService.create()
     }
     private var selectedTimeRadioBtn: RadioButton? = null
+
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +57,7 @@ class CreateAppointmentActivity : AppCompatActivity() {
         val btnNext2: Button = findViewById(R.id.btnNext2)
 
 
-        val doctorespecialty: Spinner = findViewById(R.id.spinnerDoctors)
+
 
         val etScheduledDate: EditText = findViewById(R.id.etScheduledDate)
 
@@ -95,24 +105,107 @@ class CreateAppointmentActivity : AppCompatActivity() {
         }
 
         loadSpecialties()
+        listenSpecialtyChanges()
+        listenDoctorAndDateChanges()
         /*val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
         val specialtyOptions=arrayOf("Especialidad A","Especialidad B","Especialidad C")
         spinnerespecialty.adapter=
             ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, specialtyOptions)*/
 
 
-        val doctorOptions=arrayOf("Doctor A","Doctor B","Doctor C")
+        /*val doctorOptions=arrayOf("Doctor A","Doctor B","Doctor C")
         doctorespecialty.adapter=
-            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, doctorOptions)
+            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, doctorOptions)*/
 
 
 
     }
 
+    private fun listenDoctorAndDateChanges() {
+        // doctors
+        val spinnerDoctors: Spinner = findViewById(R.id.spinnerDoctors)
+        val etScheduledDate: EditText = findViewById(R.id.etScheduledDate)
+        spinnerDoctors.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+            override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val doctor = adapter?.getItemAtPosition(position) as Doctor
+                loadHours(doctor.id, etScheduledDate.text.toString())
+            }
+        }
+
+
+
+        // scheduled date
+        etScheduledDate.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                Log.d("MiClase", "El usuario hizo clic en el botón 1");
+            }
+
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+                Log.d("MiClase", "El usuario hizo clic en el botón 2");
+            }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                Log.d("MiClase", "El usuario hizo clic en el botón 3");
+                val doctor = spinnerDoctors.selectedItem as Doctor
+                loadHours(doctor.id, etScheduledDate.text.toString())
+            }
+
+
+        })
+    }
+
+    private fun loadHours(doctorId: Int, date: String) {
+
+        val tvSelectDoctorAndDate: TextView = findViewById(R.id.tvSelectDoctorAndDate)
+
+        if (date.isEmpty()) {
+            return
+        }
+
+        val call = apiService.getHours(doctorId, date)
+        call.enqueue(object: Callback<Schedule> {
+            override fun onFailure(call: Call<Schedule>, t: Throwable) {
+                Toast.makeText(this@CreateAppointmentActivity, getString(R.string.error_loading_hours), Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onResponse(call: Call<Schedule>, response: Response<Schedule>) {
+                if (response.isSuccessful) {
+                    val schedule = response.body()
+                    //Toast.makeText(this@CreateAppointmentActivity, "morning: ${schedule?.morning?.size}, afternoon: ${schedule?.afternoon?.size}", Toast.LENGTH_SHORT).show()
+
+                    // val hours = arrayOf("3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM")
+                    schedule?.let {
+                        tvSelectDoctorAndDate.visibility = View.GONE
+
+                        val intervals = it.morning + it.afternoon
+                        val hours = ArrayList<String>()
+                        intervals.forEach { interval ->
+                            hours.add(interval.start)
+                        }
+                        displayIntervalRadios(hours)
+                    }
+                }
+            }
+
+        })
+        //Toast.makeText(this, "doctor: $doctorId, date: $date", Toast.LENGTH_SHORT).show()
+    }
+
     private fun loadSpecialties() {
-
-
-
+        val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
         val call = apiService.getSpecialties()
         call.enqueue(object: Callback<ArrayList<Specialty>> {
             override fun onFailure(call: Call<ArrayList<Specialty>>, t: Throwable) {
@@ -122,26 +215,62 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call<ArrayList<Specialty>>, response: Response<ArrayList<Specialty>>) {
                 if (response.isSuccessful) { // [200...300)
-                    /*response.body()?.let {
+                    response.body()?.let {
                         val specialties = it.toMutableList()
                         spinnerespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, specialties)
-                    }*/
-                    val specialties = response.body()
+                    }
+
+                    /*val specialties = response.body()
                     val specialtyOptions = ArrayList<String>()
 
                     specialties?.forEach {
                         specialtyOptions.add(it.name)
                     }
-                    val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
-                    spinnerespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, specialtyOptions)
+
+                    spinnerespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, specialtyOptions)*/
+
+                    /*val specialties = response.body()
+                    spinnerespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, specialties)*/
                 }
             }
         })
 
+    }
 
-        //val specialtyOptions=arrayOf("Especialidad A","Especialidad B","Especialidad C")
-        /*spinnerespecialty.adapter=
-            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, specialtyOptions)*/
+    private fun listenSpecialtyChanges() {
+        val spinnerespecialty: Spinner = findViewById(R.id.spinnerSpecialties)
+        spinnerespecialty.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val specialty = adapter?.getItemAtPosition(position) as Specialty
+                loadDoctors(specialty.id)
+            }
+        }
+    }
+
+
+    private fun loadDoctors(specialtyId: Int) {
+        val doctorespecialty: Spinner = findViewById(R.id.spinnerDoctors)
+        val call = apiService.getDoctors(specialtyId)
+        call.enqueue(object: Callback<ArrayList<Doctor>> {
+            override fun onFailure(call: Call<ArrayList<Doctor>>, t: Throwable) {
+                Toast.makeText(this@CreateAppointmentActivity, getString(R.string.error_loading_doctors), Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onResponse(call: Call<ArrayList<Doctor>>, response: Response<ArrayList<Doctor>>) {
+                if (response.isSuccessful) { // [200...300)
+                    response.body()?.let {
+                        val doctors = it.toMutableList()
+                        //val doctors = response.body()
+
+                        doctorespecialty.adapter = ArrayAdapter(this@CreateAppointmentActivity, android.R.layout.simple_list_item_1, doctors)
+                    }
+                }
+            }
+        })
     }
     @SuppressLint("StringFormatMatches")
     fun onClickScheduledDate(v: View?) {
@@ -162,13 +291,13 @@ class CreateAppointmentActivity : AppCompatActivity() {
                 resources.getString(
                     R.string.date_format,
                     y,
-                    //(m+1).twoDigits(),
-                    m.twoDigits(),
+                    (m+1).twoDigits(),
+                    //m.twoDigits(),
                     d.twoDigits()
                 )
             )
             scheduledDate.error=null
-            displayRadioButtons()
+
         }
 
         // new dialog
@@ -188,9 +317,10 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
     }
 
-    private fun displayRadioButtons(){
+    private fun displayIntervalRadios(hours: ArrayList<String>){
         val radioGroupLeft: LinearLayout = findViewById(R.id.radioGroupLeft)
         val radioGroupRight: LinearLayout = findViewById(R.id.radioGroupRight)
+        val tvNotAvailableHours: TextView = findViewById(R.id.tvNotAvailableHours)
         //var selectedTimeRadioBtn: RadioButton? = null
         //radigrp.clearCheck()
         //radigrp.removeAllViews()
@@ -198,9 +328,14 @@ class CreateAppointmentActivity : AppCompatActivity() {
         radioGroupLeft.removeAllViews()
         radioGroupRight.removeAllViews()
 
+        if (hours.isEmpty()) {
+            tvNotAvailableHours.visibility = View.VISIBLE
+            return
+        }
 
+        tvNotAvailableHours.visibility = View.GONE
 
-        val hours = arrayOf("3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM")
+        //val hours = arrayOf("3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM")
         var goToLeft = true
 
         hours.forEach {
