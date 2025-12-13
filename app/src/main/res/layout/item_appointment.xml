@@ -55,6 +55,16 @@
                 android:id="@+id/tvStatus"
                 tools:text="Confirmada"/>
 
+            <ImageButton
+                android:id="@+id/ibExpand"
+                android:src="@drawable/ic_expand_more"
+                tools:src="@drawable/ic_expand_less"
+                android:background="@color/white"
+                android:layout_gravity="end"
+                android:layout_margin="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
         </FrameLayout>
 
         <LinearLayout

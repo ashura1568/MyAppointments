@@ -1,6 +1,7 @@
 package com.example.myappointments.io
 
 import com.example.myappointments.io.response.LoginResponse
+import com.example.myappointments.model.Appointment
 import com.example.myappointments.model.Doctor
 import com.example.myappointments.model.Schedule
 import com.example.myappointments.model.Specialty
@@ -10,6 +11,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -29,8 +31,12 @@ interface ApiService {
     fun postLogin(@Query("email") email: String, @Query("password") password: String):
             Call<LoginResponse>
 
-    /*@POST("logout")
-    fun postLogout(@Header("Authorization") authHeader: String): Call<Void>*/
+    @POST("logout")
+    fun postLogout(@Header("Authorization") authHeader: String): Call<Void>
+
+    @GET("appointments")
+    fun getAppointments(@Header("Authorization") authHeader: String):
+            Call<ArrayList<Appointment>>
 
     companion object Factory {
         // Local IP to use on an emulator

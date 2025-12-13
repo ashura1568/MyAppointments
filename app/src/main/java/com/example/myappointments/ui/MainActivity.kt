@@ -121,7 +121,15 @@ class MainActivity : AppCompatActivity() {
         val etEmail: EditText = findViewById(R.id.etEmail)
         val etPassword: EditText = findViewById(R.id.etPassword)
 
-        val call = apiService.postLogin(etEmail.toString(), etPassword.toString())
+        val email = etEmail.text.toString()
+        val password = etPassword.text.toString()
+
+        if (email.trim().isEmpty() || password.trim().isEmpty()) {
+            toast(getString(R.string.error_empty_credentials))
+            return
+        }
+
+        val call = apiService.postLogin(email, password)
         call.enqueue(object: Callback<LoginResponse> {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 toast(t.localizedMessage)
@@ -136,8 +144,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (loginResponse.success) {
                         createSessionPreference(loginResponse.jwt)
-                        //toast(getString(R.string.welcome_name, loginResponse.user.name))
+                        toast(getString(R.string.welcome_name, loginResponse.user.name))
                         //goToMenuActivity(true)
+                        goToMenuActivity()
                     } else {
                         toast(getString(R.string.error_invalid_credentials))
                     }

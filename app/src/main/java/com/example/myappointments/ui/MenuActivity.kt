@@ -6,9 +6,23 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myappointments.PreferenceHelper
 import com.example.myappointments.PreferenceHelper.set
+import com.example.myappointments.PreferenceHelper.get
 import com.example.myappointments.R
+import com.example.myappointments.io.ApiService
+import com.example.myappointments.util.toast
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MenuActivity : AppCompatActivity() {
+
+    private val apiService by lazy {
+        ApiService.create()
+    }
+    private val preferences by lazy {
+        PreferenceHelper.defaultPrefs(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
@@ -31,11 +45,45 @@ class MenuActivity : AppCompatActivity() {
         val buttonLogout: Button = findViewById(R.id.btnLogout)
 
         buttonLogout.setOnClickListener {
-            clearSessionPreference()
+            performLogout()
+            /*clearSessionPreference()
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-            finish()
+            finish()*/
         }
+    }
+
+    private fun performLogout() {
+        /*val call = apiService.postLogout(authHeader)
+        call.enqueue(object: Callback<Void> {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                toast(t.localizedMessage)
+            }
+
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                clearSessionPreference()
+
+                val intent = Intent(this@MenuActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        })*/
+        //val call = apiService.postLogout(authHeader)
+        val jwt = preferences["jwt",""]
+        val call = apiService.postLogout("Bearer $jwt")
+        call.enqueue(object: Callback<Void> {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                toast(t.localizedMessage)
+            }
+
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                clearSessionPreference()
+
+                val intent = Intent(this@MenuActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        })
     }
 
 
@@ -47,7 +95,9 @@ class MenuActivity : AppCompatActivity() {
         editor.putBoolean("session",false)
         editor.apply()*/
 
-        val preferences = PreferenceHelper.defaultPrefs(this)
-        preferences["session"] = false
+        //val preferences = PreferenceHelper.defaultPrefs(this)
+        //preferences["session"] = false
+
+        preferences["jwt"] = ""
     }
 }
