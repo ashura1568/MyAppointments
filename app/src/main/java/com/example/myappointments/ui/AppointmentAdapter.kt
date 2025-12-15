@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myappointments.R
 import com.example.myappointments.model.Appointment
+import androidx.transition.TransitionManager
+import androidx.transition.AutoTransition
 
 class AppointmentAdapter
     : RecyclerView.Adapter<AppointmentAdapter.ViewHolder>() {
@@ -44,7 +46,7 @@ class AppointmentAdapter
                 tvCreatedAt.text = context.getString(R.string.item_appointment_created_at, appointment.createdAt)
 
                 ibExpand.setOnClickListener {
-                    //TransitionManager.beginDelayedTransition(parent as ViewGroup, AutoTransition())
+                    TransitionManager.beginDelayedTransition(parent as ViewGroup, AutoTransition())
 
                     if (linearLayoutDetails.visibility == View.VISIBLE) {
                         linearLayoutDetails.visibility = View.GONE

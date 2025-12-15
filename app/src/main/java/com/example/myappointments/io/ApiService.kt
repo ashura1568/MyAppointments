@@ -1,6 +1,7 @@
 package com.example.myappointments.io
 
 import com.example.myappointments.io.response.LoginResponse
+import com.example.myappointments.io.response.SimpleResponse
 import com.example.myappointments.model.Appointment
 import com.example.myappointments.model.Doctor
 import com.example.myappointments.model.Schedule
@@ -12,6 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -37,6 +39,19 @@ interface ApiService {
     @GET("appointments")
     fun getAppointments(@Header("Authorization") authHeader: String):
             Call<ArrayList<Appointment>>
+
+    @POST("appointments")
+    @Headers("Accept: application/json")
+    fun storeAppointment(
+        @Header("Authorization") authHeader: String,
+        @Query("description") description: String,
+        @Query("specialty_id") specialtyId: Int,
+        @Query("doctor_id") doctorId: Int,
+        @Query("scheduled_date") scheduledDate: String,
+        @Query("scheduled_time") scheduledTime: String,
+        @Query("type") type: String
+    ): Call<SimpleResponse>
+    //): Call<ArrayList<Appointment>>
 
     companion object Factory {
         // Local IP to use on an emulator

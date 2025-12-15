@@ -24,9 +24,13 @@ import com.example.myappointments.R
 import java.util.Calendar
 import com.google.android.material.snackbar.Snackbar
 import com.example.myappointments.io.ApiService
+import com.example.myappointments.io.response.SimpleResponse
 import com.example.myappointments.model.Doctor
 import com.example.myappointments.model.Schedule
 import com.example.myappointments.model.Specialty
+import com.example.myappointments.util.toast
+import com.example.myappointments.util.PreferenceHelper
+import com.example.myappointments.util.PreferenceHelper.get
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,6 +39,10 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
     val apiService: ApiService by lazy {
         ApiService.create()
+    }
+
+    private val preferences by lazy {
+        PreferenceHelper.defaultPrefs(this)
     }
     private var selectedTimeRadioBtn: RadioButton? = null
 
@@ -96,12 +104,13 @@ class CreateAppointmentActivity : AppCompatActivity() {
         }
 
         buttonConfirm.setOnClickListener {
-            Toast.makeText(
+            /*Toast.makeText(
                 this,
                 "Cita registrada correctamente",
                 Toast.LENGTH_SHORT
             ).show()
-            finish()
+            finish()*/
+            performStoreAppointment()
         }
 
         loadSpecialties()
@@ -121,6 +130,50 @@ class CreateAppointmentActivity : AppCompatActivity() {
 
     }
 
+    private fun performStoreAppointment() {
+
+        val btnConfirmAppointment: Button = findViewById(R.id.btnConfirmAppointment)
+        btnConfirmAppointment.isClickable = false
+        val jwt = preferences["jwt", ""]
+        val authHeader = "Bearer $jwt"
+        val tvConfirmDescription: TextView = findViewById(R.id.tvConfirmDescription)
+        val description = tvConfirmDescription.text.toString()
+        val spinnerSpecialties: Spinner = findViewById(R.id.spinnerSpecialties)
+        val specialty = spinnerSpecialties.selectedItem as Specialty
+        val spinnerDoctors: Spinner = findViewById(R.id.spinnerDoctors)
+        val doctor = spinnerDoctors.selectedItem as Doctor
+        val tvConfirmDate: TextView = findViewById(R.id.tvConfirmDate)
+        val scheduledDate = tvConfirmDate.text.toString()
+        val tvConfirmTime: TextView = findViewById(R.id.tvConfirmTime)
+        val scheduledTime = tvConfirmTime.text.toString()
+        val tvConfirmType: TextView = findViewById(R.id.tvConfirmType)
+        val type = tvConfirmType.text.toString()
+
+        val call = apiService.storeAppointment(
+            authHeader, description,
+            specialty.id, doctor.id,
+            scheduledDate, scheduledTime,
+            type
+        )
+        call.enqueue(object: Callback<SimpleResponse> {
+            override fun onFailure(call: Call<SimpleResponse>, t: Throwable) {
+                toast(t.localizedMessage)
+                btnConfirmAppointment.isClickable = true
+            }
+
+            override fun onResponse(call: Call<SimpleResponse>, response: Response<SimpleResponse>) {
+                if (response.isSuccessful) {
+                    toast(getString(R.string.create_appointment_success))
+                    finish()
+                } else {
+                    toast(getString(R.string.create_appointment_error))
+                    btnConfirmAppointment.isClickable = true
+                }
+            }
+        })
+
+
+    }
     private fun listenDoctorAndDateChanges() {
         // doctors
         val spinnerDoctors: Spinner = findViewById(R.id.spinnerDoctors)
