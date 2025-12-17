@@ -34,7 +34,7 @@
             android:text="@string/label_name"/>
 
         <EditText
-            android:id="@+id/textPersonName"
+            android:id="@+id/etRegisterName"
             android:textColor="@color/white"
             android:inputType="textPersonName"
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
             android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_password"/>
+            android:text="@string/label_password_confirmation"/>
 
         <EditText
             android:id="@+id/etRegisterPasswordConfirmation"

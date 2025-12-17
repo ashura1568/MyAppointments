@@ -53,6 +53,15 @@ interface ApiService {
     ): Call<SimpleResponse>
     //): Call<ArrayList<Appointment>>
 
+    @POST("register")
+    @Headers("Accept: application/json")
+    fun postRegister(
+        @Query("name") name: String,
+        @Query("email") email: String,
+        @Query("password") password: String,
+        @Query("password_confirmation") password_confirmation: String
+    ): Call<LoginResponse>
+
     companion object Factory {
         // Local IP to use on an emulator
         //php artisan serve --host=0.0.0.0

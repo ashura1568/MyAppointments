@@ -2,11 +2,25 @@ package com.example.myappointments.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myappointments.io.response.LoginResponse
+import com.example.myappointments.util.PreferenceHelper
+import com.example.myappointments.util.PreferenceHelper.set
+import com.example.myappointments.util.toast
 import com.example.myappointments.R
+import com.example.myappointments.io.ApiService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
+
+    private val apiService by lazy {
+        ApiService.create()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
@@ -14,10 +28,76 @@ class RegisterActivity : AppCompatActivity() {
 
         val buttonLogout: TextView = findViewById(R.id.tvGoToLogin)
 
+        val btnConfirmRegister: Button = findViewById(R.id.btnConfirmRegister)
+
         buttonLogout.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
+        btnConfirmRegister.setOnClickListener {
+            performRegister()
+        }
+
+    }
+
+    private fun performRegister() {
+
+        val etRegisterName: EditText = findViewById(R.id.etRegisterName)
+        val etRegisterEmail: EditText = findViewById(R.id.etRegisterEmail)
+        val etRegisterPassword: EditText = findViewById(R.id.etRegisterPassword)
+        val etRegisterPasswordConfirmation: EditText = findViewById(R.id.etRegisterPasswordConfirmation)
+
+        val name = etRegisterName.text.toString().trim()
+        val email = etRegisterEmail.text.toString().trim()
+        val password = etRegisterPassword.text.toString()
+        val passwordConfirmation = etRegisterPasswordConfirmation.text.toString()
+
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || passwordConfirmation.isEmpty()) {
+            toast(getString(R.string.error_register_empty_fields))
+            return
+        }
+
+        if (password != passwordConfirmation) {
+            toast(getString(R.string.error_register_passwords_do_not_match))
+            return
+        }
+
+        val call = apiService.postRegister(name, email, password, passwordConfirmation)
+        call.enqueue(object: Callback<LoginResponse> {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                toast(t.localizedMessage)
+            }
+
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                if (response.isSuccessful) {
+                    val loginResponse = response.body()
+                    if (loginResponse == null) {
+                        toast(getString(R.string.error_login_response))
+                        return
+                    }
+                    if (loginResponse.success) {
+                        createSessionPreference(loginResponse.jwt)
+                        toast(getString(R.string.welcome_name, loginResponse.user.name))
+                        goToMenuActivity()
+                    } else {
+                        toast(getString(R.string.error_register_validation))
+                    }
+                } else {
+                    toast(getString(R.string.error_register_validation))
+                }
+            }
+        })
+    }
+
+    private fun createSessionPreference(jwt: String) {
+        val preferences = PreferenceHelper.defaultPrefs(this)
+        preferences["jwt"] = jwt
+    }
+
+    private fun goToMenuActivity() {
+        val intent = Intent(this, MenuActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
