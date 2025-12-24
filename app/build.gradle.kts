@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
 }
 
 android {
@@ -54,8 +55,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.6.4")
     implementation("com.squareup.retrofit2:converter-gson:2.6.4")
     implementation("com.squareup.okhttp3:logging-interceptor:3.9.1")
-    implementation(libs.firebase.appdistribution.gradle)
-
+    implementation(libs.androidx.core)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

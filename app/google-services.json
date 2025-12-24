@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "646109437892",
+    "project_id": "my-appointments-90aea",
+    "storage_bucket": "my-appointments-90aea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:646109437892:android:f8cbf0c22c8d40b4a20e91",
+        "android_client_info": {
+          "package_name": "com.example.myappointments"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlCku_I6ehQzmAS8fC-G60fnhs2RD1cZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -17,9 +17,21 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import com.example.myappointments.model.*
 
 interface ApiService {
+    @GET("user")
+    @Headers("Accept: application/json")
+    fun getUser(@Header("Authorization") authHeader: String): Call<User>
 
+    @POST("user")
+    @Headers("Accept: application/json")
+    fun postUser(
+        @Header("Authorization") authHeader: String,
+        @Query("name") name: String,
+        @Query("phone") phone: String,
+        @Query("address") address: String
+    ): Call<Void>
     @GET("specialties")
     fun getSpecialties(): Call<ArrayList<Specialty>>
 

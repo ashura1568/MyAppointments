@@ -11,6 +11,8 @@ activity = "1.8.0"
 constraintlayout = "2.1.4"
 material3 = "1.4.0"
 firebaseAppdistributionGradle = "5.2.0"
+firebaseMessagingKtx = "25.0.1"
+core = "1.10.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -23,6 +25,8 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 firebase-appdistribution-gradle = { group = "com.google.firebase", name = "firebase-appdistribution-gradle", version.ref = "firebaseAppdistributionGradle" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
